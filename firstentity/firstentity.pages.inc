@@ -2,16 +2,16 @@
 /*
  * list persons
  */
-function firstentity_person_list(){
-  $results = db_select('person','p')->fields('p')->execute();
+function firstentity_person_list() {
+  $results = db_select('person' , 'p')->fields('p')->execute();
   $persons = array();
-  foreach( $results as $record ){
+  foreach ( $results as $record ) {
     $persons[ $record->person_id ] = $record;
   }
   // calling attach_load on array is more effiecient than inside the above loop
   field_attach_load( 'person' , $persons );
   $content = array();
-  foreach( $persons as $person ){
+  foreach ( $persons as $person ) {
     $content[] = array(
       '#markup' => l( "$person->personality: $person->name" , 'person/' . $person->person_id )
     );
@@ -22,7 +22,7 @@ function firstentity_person_list(){
 /*
  * view a person
  */
-function firstentity_person( $person ){
+function firstentity_person( $person ) {
   $content[] = array(
     '#markup' => l( $person->name , 'person/' . $person->person_id )
   );
@@ -32,10 +32,11 @@ function firstentity_person( $person ){
 /*
  * person administration
  */
-function firstentity_person_admin($personality = NULL){
-  if($personality){
+function firstentity_person_admin($personality = NULL) {
+  if ($personality) {
     return drupal_get_form( 'firstentity_addperson' , $personality );
-  }else{
+  }
+  else{
     $rows = array();
     $rows[] = array( l( 'teacher' , 'admin/person/teacher' ) );
     $rows[] = array( l( 'student' , 'admin/person/student' ) );
@@ -49,7 +50,7 @@ function firstentity_person_admin($personality = NULL){
 /*
  * create a new person
  */
-function firstentity_addperson($form,&$form_state,$personality){
+function firstentity_addperson($form , &$form_state , $personality) {
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => 'name'
@@ -78,10 +79,10 @@ function firstentity_addperson($form,&$form_state,$personality){
   );
   return $form;
 }
-function firstentity_addperson_validate( $form , &$form_state ){
+function firstentity_addperson_validate( $form , &$form_state ) {
   entity_form_field_validate( 'person' , $form , $form_state );
 }
-function firstentity_addperson_submit( $form , &$form_state ){
+function firstentity_addperson_submit( $form , &$form_state ) {
   $person = $form_state['values']['person'];
   $person->name = check_plain( $form_state['values']['name'] );
   drupal_write_record( 'person' , $person );
@@ -97,7 +98,7 @@ function firstentity_addperson_submit( $form , &$form_state ){
 /*
  * edit an existing person
  */
-function firstentity_person_edit($form,&$form_state,$person){
+function firstentity_person_edit($form , &$form_state , $person) {
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => 'name',
@@ -126,10 +127,10 @@ function firstentity_person_edit($form,&$form_state,$person){
   );
   return $form;
 }
-function firstentity_person_edit_validate( $form , &$form_state ){
+function firstentity_person_edit_validate( $form , &$form_state ) {
   entity_form_field_validate( 'person' , $form , $form_state );
 }
-function firstentity_person_edit_submit( $form , &$form_state ){
+function firstentity_person_edit_submit( $form , &$form_state ) {
   $person = $form_state['values']['person'];
   $person->name = check_plain( $form_state['values']['name'] );
   drupal_write_record( 'person' , $person , array('person_id') );
@@ -142,7 +143,7 @@ function firstentity_person_edit_submit( $form , &$form_state ){
   drupal_set_message( " the $person->personality got saved " );
   $form_state['redirect'] = 'person/' . $person->person_id;
 }
-function firstentity_person_edit_delete( $form , &$form_state ){
+function firstentity_person_edit_delete( $form , &$form_state ) {
   $person = $form_state['values']['person'];
   field_attach_delete( 'person' , $person );
   db_delete('person')
