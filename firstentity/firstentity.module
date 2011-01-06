@@ -46,7 +46,6 @@ function firstentity_menu(){
 }
 
 function firstentity_menu_person(){
-	$items = array();
 	// lists all persons
 	// appears under site navigation menu
   $items['person'] = array(
@@ -87,7 +86,6 @@ function firstentity_menu_person(){
 }
 
 function firstentity_menu_admin_person(){
-	$itesm = array();
 	// list personalities 
 	// appears under administration toolbar 
   $items['admin/person'] = array(
