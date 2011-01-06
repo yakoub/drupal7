@@ -13,7 +13,7 @@ function firstentity_person_list(){
   $content = array();
   foreach( $persons as $person ){
     $content[] = array(
-      '#markup' => l( $person->name , 'person/' . $person->person_id )
+      '#markup' => l( "$person->personality: $person->name" , 'person/' . $person->person_id )
     );
     $content[] = field_attach_view( 'person' , $person , 'full' );
   }
