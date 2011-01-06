@@ -1,0 +1,81 @@
+<?php
+function modfirst_install(){
+	/*
+	  create fields
+	  search for modules that implements hook_field_info 
+	  to know what types are available
+	 */
+	$text = array(
+		'field_name' => 'modfirst_text',
+		'type' => 'text'
+	);
+	$field_text = field_create_field($text);
+	
+	$text_list = array(
+		'field_name' => 'modfirst_text_list',
+		'type' => 'text_with_summary',
+		'cardinality' => -1,
+	);
+	$field_text_list = field_create_field($text_list);
+
+	$image = array(
+		'field_name' => 'modfirst_image',
+		'type' => 'image',
+	);
+	$field_image = field_create_field($image);
+	
+	/*
+	  create user intances
+	  now use the created fields in user entities
+	  user entity has only one bundle
+	 */
+	$bio_list = array(
+		'label' => 'Biography items',
+		'field_name' => 'modfirst_text_list',
+		'settings' => array( 'display_summary' => 1),
+		'entity_type' => 'user',
+		'bundle' => 'user'
+	);
+	field_create_instance($bio_list);
+
+	$last_name = array(
+		'label' => 'Last Name',
+		'required' => TRUE,
+		'field_name' => 'modfirst_text',
+		'entity_type' => 'user',
+		'bundle' => 'user'
+	);
+	field_create_instance($last_name);
+	
+	/*
+	  create article instances
+	  the node entity defines its content types as bundles
+	 */
+	$reference = array(
+		'label' => 'Reference items',
+		'field_name' => 'modfirst_text_list',
+		'settings' => array( 'display_summary' => 1),
+		'entity_type' => 'node',
+		'bundle' => 'article'
+	);
+	field_create_instance($reference);
+
+	$article_image = array(
+		'label' => 'Article image',
+		'required' => TRUE,
+		'field_name' => 'modfirst_image',
+		'entity_type' => 'node',
+		'bundle' => 'article'
+	);
+	field_create_instance($article_image);
+}
+
+function modfirst_uninstall(){
+	/*
+	  field_delete_field will delete all instances as well
+	  it possible to delete specific instances with field_delete_instance
+	 */
+	field_delete_field('modfirst_text');
+	field_delete_field('modfirst_text_list');
+	field_delete_field('modfirst_image');
+}

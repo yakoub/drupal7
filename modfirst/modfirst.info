@@ -1,0 +1,4 @@
+name = "first module"
+description = "first module"
+package = first 
+core = 7.x
