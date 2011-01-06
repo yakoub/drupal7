@@ -1,110 +1,145 @@
 <?php
+/*
+ * hook_entity_info
+ */
 function firstentity_entity_info(){
-	$person = array(
-		'label' => 'person',
-		'base table' => 'person',
-		'uri callback' => 'firstentity_personuri',
-		'fieldable' => TRUE,
-		'entity keys' => array( 'id' => 'person_id' , 'bundle' => 'personality'),
-		'bundle keys' => array( 'bundle' => 'personality' ),
-		'bundles' => array()
-	);
-	$person['bundles']['teacher'] = array(
-		'label' => t('Teacher'),
-		'admin' => array(
-			'path'=>'admin/person/%personality',
-			'real path'=>'admin/person/teacher',
-			'bundle argument' => 2,
-			'access arguments' => array('administer people')
-		)
-	);
-	$person['bundles']['student'] = array(
-		'label' => t('Student'),
-		'admin' => array(
-			'path'=>'admin/person/%personality',
-			'real path'=>'admin/person/student',
-			'bundle argument' => 2,
-			'access arguments' => array('administer people')
-		)
-	);
-	$entities = array(
-		'person'=>$person
-	);
-	return $entities;
+  $person = array(
+    'label' => 'person',
+    'base table' => 'person',
+    'uri callback' => 'firstentity_personuri',
+    'fieldable' => TRUE,
+    'entity keys' => array( 'id' => 'person_id' , 'bundle' => 'personality'),
+    'bundle keys' => array( 'bundle' => 'personality' ),
+    'bundles' => array()
+  );
+  $person['bundles']['teacher'] = array(
+    'label' => t('Teacher'),
+    'admin' => array(
+      'path'=>'admin/person/%personality',
+      'real path'=>'admin/person/teacher',
+      'bundle argument' => 2,
+      'access arguments' => array('administer people')
+    )
+  );
+  $person['bundles']['student'] = array(
+    'label' => t('Student'),
+    'admin' => array(
+      'path'=>'admin/person/%personality',
+      'real path'=>'admin/person/student',
+      'bundle argument' => 2,
+      'access arguments' => array('administer people')
+    )
+  );
+  $entities = array(
+    'person'=>$person
+  );
+  return $entities;
 }
+
 function firstentity_menu(){
-	$items['person'] = array(
-		'title' => 'person list',
-		'access arguments' => array('access content'),
-		'page callback' => 'firstentity_person_list',
-		'file' => 'firstentity.pages.inc',
-		'type' => MENU_NORMAL_ITEM
-	);
-	$items['person/%person'] = array(
-		'title callback' => 'firstentity_person_title',
-		'title arguments' => array(1),
-		'page callback' => 'firstentity_person',
-		'page arguments' => array(1),
-		'access arguments' => array('access content'),
-		'file' => 'firstentity.pages.inc',
-		'type' => MENU_CALLBACK
-	);
-	$items['person/%person/view'] = array(
-		'title' => 'view',
-		'access arguments' => array('access content'),
-		'weight' => -3,
-		'type' => MENU_DEFAULT_LOCAL_TASK
-	);
-	$items['person/%person/edit'] = array(
-		'title' => 'edit',
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array( 'firstentity_person_edit' , 1 ),
-		'access arguments' => array('access content'),
-		'file' => 'firstentity.pages.inc',
-		'type' => MENU_LOCAL_TASK
-	);
-
-	$items['admin/person'] = array(
-		'title' => 'admin person',
-		'access arguments' => array('access content'),
-		'page callback' => 'firstentity_person_admin',
-		'file' => 'firstentity.pages.inc',
-		'type' => MENU_NORMAL_ITEM
-	);
-	$items['admin/person/%personality'] = array(
-		'title callback' => 'firstentity_personality_title',
-		'title arguments' => array(2),
-		'access arguments' => array('access content'),
-		'page arguments' => array(2),
-	);
-	$items['admin/person/%personality/add'] = array(
-		'title' => 'add',
-		'access arguments' => array('access content'),
-		'type' => MENU_DEFAULT_LOCAL_TASK
-	);
-
-	return $items;
+	$items = array();
+	// pages to view and edit person
+	$items += firstentity_menu_person();
+	// pages to admin person entity and create persons
+	$items += firstentity_menu_admin_person();
+  return $items;
 }
+
+function firstentity_menu_person(){
+	$items = array();
+	// lists all persons
+	// appears under site navigation menu
+  $items['person'] = array(
+    'title' => 'person list',
+    'access arguments' => array('access content'),
+    'page callback' => 'firstentity_person_list',
+    'file' => 'firstentity.pages.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  // single person page
+  // see person_load to see how %person is loaded
+  $items['person/%person'] = array(
+    'title callback' => 'firstentity_person_title',
+    'title arguments' => array(1),
+    'page callback' => 'firstentity_person',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'file' => 'firstentity.pages.inc',
+    'type' => MENU_CALLBACK
+  );
+  // view tab
+  $items['person/%person/view'] = array(
+    'title' => 'view',
+    'access arguments' => array('access content'),
+    'weight' => -3,
+    'type' => MENU_DEFAULT_LOCAL_TASK
+  );
+  // edit tab
+  $items['person/%person/edit'] = array(
+    'title' => 'edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array( 'firstentity_person_edit' , 1 ),
+    'access arguments' => array('access content'),
+    'file' => 'firstentity.pages.inc',
+    'type' => MENU_LOCAL_TASK
+  );
+  return $items;
+}
+
+function firstentity_menu_admin_person(){
+	$itesm = array();
+	// list personalities 
+	// appears under administration toolbar 
+  $items['admin/person'] = array(
+    'title' => 'admin person',
+    'access arguments' => array('access content'),
+    'page callback' => 'firstentity_person_admin',
+    'file' => 'firstentity.pages.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  // personality admin page , used by field attach api
+  // see personality_load to see how %personality is loaded
+  $items['admin/person/%personality'] = array(
+    'title callback' => 'firstentity_personality_title',
+    'title arguments' => array(2),
+    'access arguments' => array('access content'),
+    'page arguments' => array(2),
+  );
+  // personality default tab : create a person
+  $items['admin/person/%personality/add'] = array(
+    'title' => 'add',
+    'access arguments' => array('access content'),
+    'type' => MENU_DEFAULT_LOCAL_TASK
+  );
+  return $items;
+}
+/*
+ * argument loader for %person
+ */
 function person_load($id){
-	$persons = entity_load( 'person' , array($id) );
-	return $persons[$id];
+  $persons = entity_load( 'person' , array($id) );
+  return $persons[$id];
 }
+/*
+ * argument loader for %personality
+ * makes sure no xss is used thourgh the personality property
+ */
 function personality_load($personality){
-	switch($personality){
-	case 'teacher':
-	case 'student':
-		return $personality; 
-	default:
-		return FALSE;
-	}
+  switch($personality){
+  case 'teacher':
+  case 'student':
+    return $personality; 
+  default:
+    return FALSE;
+  }
 }
 function firstentity_personality_title( $personality ){
-	return $personality;
+  return $personality;
 }
 function firstentity_person_title( $person ){
-	return $person->name;
+  return $person->name;
 }
 function firstentity_personuri($person){
-	return array( 'path' => 'person/' . $person->person_id );
-}	
+  return array( 'path' => 'person/' . $person->person_id );
+}  
 

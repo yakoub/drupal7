@@ -1,29 +1,34 @@
 <?php
 function firstentity_schema(){
-	$schema['person'] = array(
-		'fields' => array(
-			'person_id' => array(
-				'type' => 'serial',
-				'unsigned' => TRUE,
-				'not null' => TRUE
-			),
-			'personality' => array(
-				'type' => 'text',
-				'size' => 'medium',
-				'not null' => TRUE
-			),
-			'name' => array(
-				'type' => 'text',
-				'size' => 'medium'
-			)
-		),
-		'primary key' => array('person_id')
-	);
-	return $schema;
+  $schema['person'] = array(
+    'fields' => array(
+      'person_id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'personality' => array(
+        'type' => 'text',
+        'size' => 'medium',
+        'description' => 'the bundle property',
+        'not null' => TRUE
+      ),
+      'name' => array(
+        'type' => 'text',
+        'size' => 'medium'
+      )
+    ),
+    'primary key' => array('person_id')
+  );
+  return $schema;
 }
 /*
-function firstentity_uninstall(){
-	field_attach_delete_bundle( 'person' , 'teacher' );
-	field_attach_delete_bundle( 'person' , 'student' );
-}
+ * there is a bug in drupal , where field_info_field does function properly during module uninstall
+ * so the below hook_uninstall is futile
  */
+/*
+function firstentity_uninstall(){
+  field_attach_delete_bundle( 'person' , 'teacher' );
+  field_attach_delete_bundle( 'person' , 'student' );
+}
+*/
