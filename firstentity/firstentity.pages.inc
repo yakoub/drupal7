@@ -87,6 +87,7 @@ function firstentity_addperson_submit( $form , &$form_state ){
   drupal_write_record( 'person' , $person );
   entity_form_submit_build_entity( 'person' , $person , $form , $form_state );
   field_attach_submit( 'person' , $person , $form , $form_state );
+  // insert fields
   field_attach_insert( 'person' , $person );
 
   //personality has loader function so no threat for xss
@@ -134,6 +135,7 @@ function firstentity_person_edit_submit( $form , &$form_state ){
   drupal_write_record( 'person' , $person , array('person_id') );
   entity_form_submit_build_entity( 'person' , $person , $form , $form_state );
   field_attach_submit( 'person' , $person , $form , $form_state );
+  // update fields
   field_attach_update( 'person' , $person );
 
   //personality has loader function so no threat for xss
