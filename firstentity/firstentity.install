@@ -23,7 +23,7 @@ function firstentity_schema(){
   return $schema;
 }
 /*
- * there is a bug in drupal , where field_info_field does function properly during module uninstall
+ * there is a bug in drupal , where field_info_field doesn't function properly during module uninstall
  * so the below hook_uninstall is futile
  */
 /*
