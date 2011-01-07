@@ -87,13 +87,16 @@ function firstentity_addperson_validate( $form , &$form_state ) {
 function firstentity_addperson_submit( $form , &$form_state ) {
   $person = $form_state['values']['person'];
   $person->name = check_plain( $form_state['values']['name'] );
+  // write the base record in our person table
   drupal_write_record( 'person' , $person );
+  // copy values from form_state to person object
   entity_form_submit_build_entity( 'person' , $person , $form , $form_state );
+  // form submition operations
   field_attach_submit( 'person' , $person , $form , $form_state );
   // insert fields
   field_attach_insert( 'person' , $person );
 
-  //personality has loader function so no threat for xss
+  // personality has loader function so no threat for xss
   drupal_set_message( " new $person->personality got added " );
 }
 
@@ -135,18 +138,22 @@ function firstentity_person_edit_validate( $form , &$form_state ) {
 function firstentity_person_edit_submit( $form , &$form_state ) {
   $person = $form_state['values']['person'];
   $person->name = check_plain( $form_state['values']['name'] );
+  // write the base record in our person table
   drupal_write_record( 'person' , $person , array('person_id') );
+  // copy values from form_state to person object
   entity_form_submit_build_entity( 'person' , $person , $form , $form_state );
+  // form submition operations
   field_attach_submit( 'person' , $person , $form , $form_state );
   // update fields
   field_attach_update( 'person' , $person );
 
-  //personality has loader function so no threat for xss
+  // personality has loader function so no threat for xss
   drupal_set_message( " the $person->personality got saved " );
   $form_state['redirect'] = 'person/' . $person->person_id;
 }
 function firstentity_person_edit_delete( $form , &$form_state ) {
   $person = $form_state['values']['person'];
+  // delete attached fields
   field_attach_delete( 'person' , $person );
   db_delete('person')
     ->condition( 'person_id' , $person->person_id , '=' )
