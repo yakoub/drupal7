@@ -2,3 +2,4 @@ name = firstentity
 description = firstentity
 core = 7.x
 package = first
+files[] = firstentity.test
