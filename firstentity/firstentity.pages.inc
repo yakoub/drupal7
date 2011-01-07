@@ -15,6 +15,7 @@ function firstentity_person_list() {
     $content[] = array(
       '#markup' => l( "$person->personality: $person->name" , 'person/' . $person->person_id )
     );
+    // render attached fields for each person entity
     $content[] = field_attach_view( 'person' , $person , 'full' );
   }
   return $content;
@@ -26,6 +27,7 @@ function firstentity_person( $person ) {
   $content[] = array(
     '#markup' => l( $person->name , 'person/' . $person->person_id )
   );
+	// render attached fields for this person entity
   $content[] = field_attach_view( 'person' , $person , 'full' );
   return $content;
 }
