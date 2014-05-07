@@ -1,0 +1,75 @@
+<?php
+function bundle_clone_menu() {
+  $items['admin/structure/bundle_clone'] = array(
+    'title' => 'Bundle clone',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bundle_clone_admin'),
+    'access arguments' => array('administer site configuration'),
+  );
+  return $items;
+}
+
+function bundle_clone_admin($form, &$form_state) {
+  $bundles = field_info_bundles();
+  $form['entities'] = array(
+    '#type' => 'value',
+    '#value' => array_keys($bundles),
+  );
+  foreach ($bundles as $entity_type => $entity_bundles) {
+    $form[$entity_type] = array(
+      '#type' => 'fieldset',
+      '#title' => $entity_type,
+      '#tree' => TRUE,
+    );
+    $form[$entity_type] += bundle_clone_entity_items(array_keys($entity_bundles));
+  }
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  return $form;
+}
+
+function bundle_clone_admin_submit(&$form, &$form_state) {
+  foreach ($form_state['values']['entities'] as $entity_type) {
+    $source = $form_state['values'][$entity_type]['source'];
+    $target = $form_state['values'][$entity_type]['target'];
+    if ($source != 0  and $target !=0 and $source != $target) {
+      $source = $form[$entity_type]['source']['#options'][$source];
+      $target = $form[$entity_type]['target']['#options'][$target];
+      bundle_clone_clone($entity_type, $source, $target);
+    }
+  }
+}
+
+function bundle_clone_clone($entity_type, $source, $target) {
+  $instances = field_info_instances($entity_type, $source);
+  $target_instances = field_info_instances($entity_type, $target);
+  foreach ($instances as $instance => $config) {
+    if (isset($target_instances[$instance])) {
+      drupal_set_message(t('Skipping @instance', array('@instance' => $instance)));
+      continue;
+    }
+    drupal_set_message(t('Creating @instance', array('@instance' => $instance)));
+
+    unset($config['id']);
+    $config['bundle'] = $target;
+    field_create_instance($config);
+  }
+}
+
+function bundle_clone_entity_items($bundles) {
+  $items = array();
+  array_unshift($bundles, 'none');
+  $items['source'] = array(
+    '#type' => 'select',
+    '#title' => 'Source',
+    '#options' => $bundles,
+  );
+  $items['target'] = array(
+    '#type' => 'select',
+    '#title' => 'Target',
+    '#options' => $bundles,
+  );
+  return $items;
+}
