@@ -48,12 +48,22 @@ function products_main() {
 function products_theme() {
   $themes = array();
 
+  $path = drupal_get_path('module', 'products') . '/templates';
+
   $themes['product_form'] = array(
     'render element' => 'form',
     'template' => 'product-form',
     'pattern' => 'product__.+-form',
+    'path' => $path,
   );
-
+  
+  $themes['node_form'] = array(
+    'render element' => 'form',
+    'template' => 'node-form',
+    'pattern' => '.+-node-form',
+    'path' => $path,
+  );
+  
   return $themes;
 }
 
