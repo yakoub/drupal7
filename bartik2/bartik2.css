@@ -3,21 +3,21 @@ form .two-columns {
   width: 100%;
 }
 
-form .two-columns .first,
-form .two-columns .second {
+form .two-columns > .first,
+form .two-columns > .second {
   float: left; /* RTL */
 }
 
-form .two-columns .first {
+form .two-columns > .first {
   width: 60%;
 }
 
-form .two-columns .second {
+form .two-columns > .second {
   width: 38%;
   margin: 0 1%;
 }
 
-form .two-columns .bottom {
+form .two-columns > .bottom {
   clear: both;
   width: 100%;
 }
