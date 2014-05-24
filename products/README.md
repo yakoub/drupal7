@@ -6,7 +6,7 @@ so i provided theme [bartik2](https://github.com/yakoub/drupal7/tree/master/bart
 also important to note, that pattern definition would work only in module hook_theme implementation and not in theme implementation .
 
 the patterns are regular expression, 
-and the `__` component is only convetion for better readabilty.
+and the `__` component is only a convention for better readabilty.
 
 so even if node-form doesn't use `__` component, it can still be applied to a pattern.
 
