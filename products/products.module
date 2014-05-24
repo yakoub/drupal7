@@ -1,0 +1,122 @@
+<?php
+function products_menu() {
+  $items = array(
+    'products' => array(
+      'title' => 'Main products page',
+      'page callback' => 'products_main',
+      'access arguments' => array('access content'),
+    )
+  );
+
+  $form_items = array();
+
+  $form_items['products/cloths'] = array(
+    'title' => 'Cloths',
+    'page arguments' => array('products_cloths'),
+  );
+
+  $form_items['products/food'] = array(
+    'title' => 'Food',
+    'page arguments' => array('products_food'),
+  );
+
+  $form_items['products/health_care'] = array(
+    'title' => 'Health care',
+    'page arguments' => array('products_health_care'),
+  );
+
+  foreach ($form_items as $path => &$config) {
+    $config['page callback'] = 'drupal_get_form';
+    $config['access arguments'] = array('access content');
+    $config['type'] = MENU_CALLBACK;
+  }
+
+  return $items + $form_items;
+}
+
+function products_main() {
+  return array(
+    '#theme' => 'item_list',
+    '#items' => array(
+      l('Cloths', 'products/cloths'),
+      l('Food', 'products/food'),
+      l('Health care', 'products/health_care'),
+    ),
+  );
+}
+
+function products_theme() {
+  $themes = array();
+
+  $themes['product_form'] = array(
+    'render element' => 'form',
+    'template' => 'product-form',
+    'pattern' => 'product__.+-form',
+  );
+
+  return $themes;
+}
+
+function products_cloths($form, &$form_state) {
+
+  $form['#theme'] = array(
+    'product__cloths_form',
+    'product_form',
+  );
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+  );
+  
+  $form['gender'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      'male' => t('Male'),
+      'female' => t('Female'),
+    ),
+  );
+
+  return $form;
+}
+
+function products_food($form, &$form_state) {
+
+  $form['#theme'] = array(
+    'product__food_form',
+    'product_form',
+  );
+  
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+  );
+
+  $form['expiration_date'] = array(
+    '#type' => 'date',
+    '#title' => t('Expiration date'),
+  );
+  
+  return $form;
+}
+
+function products_health_care($form, &$form_state) {
+
+  $form['#theme'] = array(
+    'product__health_form',
+    'product_form',
+  );
+  
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+  );
+
+  $form['prescription'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Requires prescription'),
+  );
+  
+  return $form;
+}
+
