@@ -34,17 +34,6 @@ function products_menu() {
   return $items + $form_items;
 }
 
-function products_main() {
-  return array(
-    '#theme' => 'item_list',
-    '#items' => array(
-      l('Cloths', 'products/cloths'),
-      l('Food', 'products/food'),
-      l('Health care', 'products/health_care'),
-    ),
-  );
-}
-
 function products_theme() {
   $themes = array();
 
@@ -130,3 +119,13 @@ function products_health_care($form, &$form_state) {
   return $form;
 }
 
+function products_main() {
+  return array(
+    '#theme' => 'item_list',
+    '#items' => array(
+      l('Cloths', 'products/cloths'),
+      l('Food', 'products/food'),
+      l('Health care', 'products/health_care'),
+    ),
+  );
+}
