@@ -2,7 +2,8 @@ templates with pattern names must be copied to,
 a theme directory for them to be detected and take affect.
 
 the patterns are regular expression, 
-and the `__` component is only convetion for better readabilty,
+and the `__` component is only convetion for better readabilty.
+
 so even if node-form doesn't use `__` component, it can still be applied to a pattern.
 
 
