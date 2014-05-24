@@ -1,3 +1,5 @@
+demostrates an implementation of hook_theme that utilizes `pattern` method.
+
 templates with pattern names must be copied to,
 a theme directory for them to be detected and take affect.
 
