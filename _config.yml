@@ -1,4 +1,3 @@
-baseurl: jekyll
 highlighter: pygments
 defaults:
   -
