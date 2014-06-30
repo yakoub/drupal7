@@ -1,0 +1,8 @@
+baseurl: jekyll
+highlighter: pygments
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      author: "Yakoub"
