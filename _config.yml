@@ -1,4 +1,4 @@
-baseurl: jekyll
+baseurl: drupal7 
 highlighter: pygments
 defaults:
   -
