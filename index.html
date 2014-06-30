@@ -1,9 +1,13 @@
-<!DOCTYPE>
-<html>
-<body>
+---
+layout: main
+---
+<a href="info"> Information </a>
+
 <ul>
-  <li> first
-  <li> second
+  {% for post in site.posts %}
+    <li>
+      <a href="/{{ site.baseurl }}{{ post.url }}"> {{ post.title }} </a>
+    </li>
+  {% endfor %}
 </ul>
-</body>
-</html>
+
