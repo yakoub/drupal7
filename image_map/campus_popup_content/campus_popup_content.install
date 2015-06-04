@@ -1,0 +1,24 @@
+<?php
+
+function campus_popup_content_schema() {
+  $schema['campus_image_canvas'] = array(
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'canvas' => array(
+        'type' => 'text',
+        'size' => 'big',
+      ),
+      'style' => array(
+        'type' => 'varchar',
+        'length' => 255
+      ),
+    ),
+    'primary key' => array('nid'),
+  );
+  return $schema;
+}
+

@@ -1,0 +1,265 @@
+<?php
+
+function campus_popup_content_field_formatter_info() {
+  $formatters = array();
+  $formatters['image_canvas'] = array(
+    'label' => t('Campus image canvas'),
+    'field types' => array('image'),
+    'settings' => array(
+      'image_style' => '',
+    ),
+  );
+
+  $formatters['campus_taxonomy_entity'] = array(
+   'label' => 'Campus term entity',
+   'field types' => array('taxonomy_term_reference'),
+  );
+  return $formatters;
+}
+
+function campus_popup_content_field_formatter_settings_form(
+  $field, $instance, $view_mode, $form, &$form_state) {
+  $element = array();
+  if ($field['type'] == 'image') {
+    $element =
+      image_field_formatter_settings_form($field, $instance, $view_mode, $form, $form_state);
+    unset($element['image_link']);
+  }
+  return $element;
+}
+
+function campus_popup_content_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
+  if ($field['type'] == 'taxonomy_term_reference') {
+    taxonomy_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, $items, $displays);
+  }
+}
+
+function campus_popup_content_field_formatter_settings_summary($field, $instance, $view_mode) {
+
+  $summary = '';
+  if ($field['type'] == 'taxonomy_term_reference') {
+    $summary = 'term entity list';
+  }
+
+  if ($field['type'] == 'image') {
+    $instance['display'][$view_mode]['settings']['image_link'] = '';
+    $summary =
+      image_field_formatter_settings_summary($field, $instance, $view_mode);
+  }
+  return $summary;
+}
+
+function campus_popup_content_field_formatter_view(
+  $entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if ($display['type'] == 'campus_taxonomy_entity') {
+    $element = campus_popup_content_term_list($entity_type, $entity, $field, $instance, $langcode, $items, $display);
+  }
+  if ($display['type'] == 'image_canvas') {
+    foreach($items as $delta => $item) {
+      $style = $display['settings']['image_style'];
+      $element[$delta] = array(
+        '#markup' => campus_popup_content_image_canvas($item, $style, $entity),
+      );
+    }
+  }
+  return $element;
+}
+
+function campus_popup_content_image_canvas($item, $style_name, $node) {
+  $dimensions = array(
+    'width' => $item['width'],
+    'height' => $item['height'],
+  );
+
+  $query = db_select('campus_image_canvas', 'cic');
+  $query->condition('nid', $node->nid);
+  $query->fields('cic');
+  $canvas_settings = $query->execute()->fetchObject();
+  $canvas_json = '';
+  if ($canvas_settings) {
+    $canvas_json = $canvas_settings->canvas;
+    if ($canvas_settings->style) {
+      $style_name = $canvas_settings->style;
+    }
+  }
+
+  image_style_transform_dimensions($style_name, $dimensions);
+  $width = $dimensions['width'];
+  $height = $dimensions['height'];
+  $path = image_style_url($style_name, $item['uri']);
+  $src = file_create_url($path);
+
+  list($suggestion_list, $nodes) = campus_popup_content_suggestions();
+
+  $path = drupal_get_path('module', 'campus_popup_content');
+  drupal_add_library('system', 'ui.dialog');
+  drupal_add_js($path . '/fabric.min.js');
+  drupal_add_js($path . '/campus-fabric.js');
+  $setting = array(
+    'src' => $src,
+    'nodes' => (object) $nodes,
+    'nid' => $node->nid,
+  );
+  drupal_add_js(array('campus_canvas' => $setting), 'setting');
+  $admin = node_access('update', $node);
+
+  $output = <<<HTML
+    <canvas id="campus-canvas-image" width="$width" height="$height"> </canvas>
+    <textarea name="server-data" style="display:none"> $canvas_json </textarea>
+    <div id="campus-popup"></div>
+HTML;
+  if (!$admin) {
+    return $output;
+  }
+  $output .= <<<HTML
+    <button name="polygon"> add region </button>
+    <button name="save"> save map </button>
+    <button name="clear"> clear all </button>
+    <button name="mode"> edit </button>
+    <div id="suggestion-list"> 
+      $suggestion_list 
+    </div>
+HTML;
+  return $output;
+}
+
+function campus_popup_content_suggestions() {
+  $query = db_select('node', 'n');
+  
+  $query->condition('type', array('animal', 'image_map'));
+  $query->fields('n', array('nid', 'title', 'type'));
+  $nodes  = $query->execute()->fetchAllAssoc('nid');
+
+  $types = array(
+    'animal' => array(),
+    'image_map' => array(),
+  );
+
+  foreach ($nodes as &$node) {
+    $node->title = check_plain($node->title);
+    $types[$node->type][] = $node;
+  }
+  $options = '';
+  foreach ($types as $type => $items) {
+    $options .= '<optgroup label="' . $type . '">';
+    foreach ($items as $item) {
+      $options .= '<option value="' . $item->nid .'">' . $item->title . '</option>';
+    }
+    $options .= '</optgroup>';
+  }
+  $suggestion_list = '<select>' . $options . '</select>';
+  return array($suggestion_list, $nodes);
+}
+
+function campus_popup_content_term_list($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $output = array();
+  if ($display['type'] == 'campus_taxonomy_entity') {
+    foreach ($items as $delta => $item) {
+      if ($item['tid'] == 'autocreate') {
+        $output[] = check_plain($item['name']);
+      }
+      else {
+        $term = $item['taxonomy_term'];
+        $uri = entity_uri('taxonomy_term', $term);
+        $build = field_view_field('taxonomy_term', $term, 'field_term_graphic', array('label' => 'hidden'));
+        $build = drupal_render($build);
+        $output[] = l($build, $uri['path'], array('html' => TRUE));
+      }
+    }
+    if (count($output) > 1) {
+      $element[] = array(
+        '#theme' => 'item_list',
+        '#items' => $output,
+      );
+    }
+    elseif ($output) {
+      $element[] = array('#markup' => $output[0]);
+    }
+  }
+  return $element;
+}
+
+function campus_popup_content_menu() {
+  $items = array();
+  $items['popup/%node'] = array(
+    'title' => 'ajax content',
+    'page arguments' => array(1),
+    'page callback' => 'campus_popup_content_fetch',
+    'access arguments' => array('access content'),
+  );
+
+  $items['canvas/%node'] = array(
+    'title' => 'ajax content',
+    'page arguments' => array(1),
+    'page callback' => 'campus_popup_content_canvas',
+    'access arguments' => array('update', 1),
+    'access callback' => 'node_access',
+  );
+
+  return $items;
+}
+
+function campus_popup_content_canvas($node) {
+  if (!isset($_POST['canvas'])) {
+    return;
+  }
+  if (empty($_POST['canvas'])) {
+    db_delete('campus_image_canvas')->condition('nid', $node->nid)->execute();
+    return;
+  }
+  db_merge('campus_image_canvas')
+    ->key(array('nid' => $node->nid))
+    ->fields(array('canvas' => $_POST['canvas']))
+    ->execute();
+}
+
+function campus_popup_content_fetch($node) {
+  $node->ajax = TRUE;
+  $build = node_view($node);
+  $output = array();
+  $output['node'] = drupal_render($build);
+  $english_name = field_get_items('node', $node, 'field_english_name');
+  $output['title'] = $node->title . '|' . $english_name[0]['value'];
+  $output['title'] = check_plain($output['title']);
+  drupal_json_output($output);
+}
+
+function campus_popup_content_field_widget_form_alter(&$element, &$form_state, $context) {
+  $field = $context['field'];
+  if (!isset($form_state['node'])) {
+    return;
+  }
+  $node = $form_state['node'];
+  if($field['field_name'] == 'field_map' and $field['type'] == 'image') {
+    $element[0]['style'] = array(
+      '#type' => 'select',
+      '#title' => 'image style',
+      '#options' => image_style_options(TRUE, PASS_THROUGH),
+    );
+    if (isset($node->nid)) {
+      $query = db_select('campus_image_canvas', 'cic');
+      $query->condition('nid', $node->nid);
+      $query->addField('cic', 'style');
+      $style = $query->execute()->fetchField();
+      if ($style) {
+        $element[0]['style']['#default_value'] = $style;
+      }
+    }
+  }
+}
+
+function campus_popup_content_field_attach_update($entity_type, $entity) {
+  if ($entity_type == 'node' and $entity->type == 'image_map') {
+    $style = $entity->field_map['und'][0]['style'];
+    db_merge('campus_image_canvas')
+      ->key(array('nid' => $entity->nid))
+      ->fields(array('style' => $style))
+      ->execute();
+  }
+}
+
+function campus_popup_content_field_attach_insert($entity_type, $entity) {
+  campus_popup_content_field_attach_update($entity_type, $entity);
+}
