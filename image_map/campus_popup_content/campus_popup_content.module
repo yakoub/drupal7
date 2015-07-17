@@ -117,8 +117,18 @@ HTML;
     <button name="save"> save map </button>
     <button name="clear"> clear all </button>
     <button name="mode"> edit </button>
-    <div id="suggestion-list"> 
+    <div id="map-config"> 
+      <div>
+        <input type="radio" value="1" name="tab" checked="checked"> Reference </input>
+        <input type="radio" value="2" name="tab"> Link </input>
+      </div>
       $suggestion_list 
+      <fieldset>
+        <label> Link </label>
+        <input type="text" size="20" name="link"></input>
+        <label> Title </label>
+        <input type="text" size="20" name="title"></input>
+      </fieldset>
     </div>
 HTML;
   return $output;
