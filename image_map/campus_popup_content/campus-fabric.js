@@ -470,6 +470,15 @@ CampusCanvas.prototype.load_state = function() {
 
 CampusCanvas.prototype.clear_state = function() {
   var url = Drupal.settings.basePath + 'canvas/'+ this.nid;
-  jQuery.post(url, {canvas: ''});
-  window.location.reload();
+
+  var options = {
+    type: 'POST',
+    url: url,
+    success: function(data) {
+      window.location.reload();
+    },
+    data: {canvas: ''}
+  };
+  
+  jQuery.ajax(options);
 };
